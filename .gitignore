@@ -1,0 +1,7 @@
+# Ignorar arquivos de configuração do editor
+.vscode/
+.idea/
+
+# Ignorar arquivos de dependências e build
+node_modules/
+dist/
