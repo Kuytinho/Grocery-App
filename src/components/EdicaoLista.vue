@@ -10,7 +10,9 @@
       <h3 class="other-color">Adicionar Item</h3>
       <div class="form">
         <div class="form-item">
-          <label for="produto">Produto</label>
+          <label for="produto">
+            Produto
+          </label>
           <input id="produto" v-model="produto" type="text" placeholder="Nome do produto" />
         </div>
         <div class="form-item">
@@ -311,6 +313,9 @@ h4 {
 
 .form-item {
   margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .form input {

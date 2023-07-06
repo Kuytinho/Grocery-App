@@ -7,7 +7,8 @@
         <button class="btn-principal" type="submit">Criar</button>
     </form>
     </section>
-    <h1>Minhas Listas</h1>
+    <h1>Minhas</h1>
+    <h1>Listas</h1>
     <div class="lista">
       <div class="item" v-for="(lista, index) in listas" :key="index" @click="editarLista(lista.nome)">
         <h2>{{ lista.nome }}</h2>
