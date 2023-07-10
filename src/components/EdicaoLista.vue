@@ -10,9 +10,7 @@
       <h3 class="other-color">Adicionar Item</h3>
       <div class="form">
         <div class="form-item">
-          <label for="produto">
-            Produto
-          </label>
+          <label for="produto">Produto</label>
           <input id="produto" v-model="produto" type="text" placeholder="Nome do produto" />
         </div>
         <div class="form-item">
@@ -61,11 +59,11 @@
     <section class="column-right">
       <h3>Lista de Compras</h3>
       <div>
-        <input class="search" type="search" placeholder="Buscar" />
-        <button class="btn-principal-II">Pesquisar</button>
+        <input class="search" type="search" v-model="termoPesquisa" placeholder="Buscar" />
+        <button class="btn-principal-II" @click="pesquisar">Pesquisar</button>
       </div>
       <ul class="card-list">
-        <li v-for="(card, index) in cards" :key="index" :class="{ checked: card.checked, unchecked: !card.checked }" >
+        <li v-for="(card, index) in filteredCards" :key="index" :class="{ checked: card.checked, unchecked: !card.checked }">
           <div class="line-top">
             <label class="container">
               <input type="checkbox" v-model="card.checked" @change="checkboxChanged(card, index)" />
@@ -89,26 +87,13 @@
             </div>
             <div>
               <button class="btn-icon-card">
-                <img
-                  class="icon-card"
-                  src="../assets/edit-solid.svg"
-                  alt="Editar"
-                />
+                <img class="icon-card" src="../assets/edit-solid.svg" alt="Editar" />
               </button>
               <button class="btn-icon-card">
-                <img
-                  class="icon-card"
-                  src="../assets/exchange-alt-solid.svg"
-                  alt="Mover"
-                />
+                <img class="icon-card" src="../assets/exchange-alt-solid.svg" alt="Mover" />
               </button>
-              <button class="btn-icon-card">
-                <img
-                 @click="removerCard(index)"
-                  class="icon-GL"
-                  src="../assets/trash-alt.svg"
-                  alt="Remover"
-                />
+              <button class="btn-icon-card" @click="removerCard(index)">
+                <img class="icon-GL" src="../assets/trash-alt.svg" alt="Remover" />
               </button>
             </div>
           </div>
@@ -128,7 +113,22 @@ export default {
   data() {
     return {
       cards: [],
+      termoPesquisa: "",
     };
+  },
+  computed: {
+    filteredCards() {
+      const termo = this.termoPesquisa.toLowerCase().trim();
+
+      if (termo === "") {
+        return this.cards;
+      }
+
+      return this.cards.filter((card) => {
+        const nomeProduto = card.produto.toLowerCase();
+        return nomeProduto.includes(termo);
+      });
+    },
   },
   mounted() {
     const savedCards = localStorage.getItem("savedCards");
@@ -152,7 +152,6 @@ export default {
       this.limparFormulario();
     },
     checkboxChanged(card, index) {
-
       this.cards[index] = card;
       this.salvarCards();
     },
@@ -173,9 +172,41 @@ export default {
     },
     goHome() {
       localStorage.setItem("selected", this.nome);
-      // Redirecionar de volta para a página principal
+      // Redirecionar de volta para a página principal```javascript
       this.$router.push({ path: "/" });
     },
+    pesquisar() {
+  const termo = this.termoPesquisa.toLowerCase().trim();
+
+  if (termo === "") {
+    // Nenhum termo de pesquisa, exibir todos os cards
+    return;
+  }
+
+  this.cards.forEach((card) => {
+    const nomeProduto = card.produto.toLowerCase();
+
+    if (nomeProduto.includes(termo)) {
+      card.hidden = false; // Exibir o card
+    } else {
+      card.hidden = true; // Ocultar o card
+    }
+  });
+},
+    computed: {
+    filteredCards() {
+      const termo = this.termoPesquisa.toLowerCase().trim();
+
+      if (termo === "") {
+        return this.cards;
+      } else {
+        return this.cards.filter((card) => {
+          const nomeProduto = card.produto.toLowerCase();
+          return nomeProduto.includes(termo);
+        });
+      }
+    }
+  }
   },
 };
 </script>
