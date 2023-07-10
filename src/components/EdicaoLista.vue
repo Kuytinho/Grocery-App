@@ -103,10 +103,6 @@
       <ul>
         <li v-for="(card, index) in itensNaoNecessarios" :key="index" :class="{ checked: card.checked, unchecked: !card.checked }">
           <div class="line-top">
-            <label class="container">
-              <input type="checkbox" v-model="card.checked" @change="checkboxChanged(card, index)" />
-              <span class="checkmark"></span>
-            </label>
             <div class="line-top-inside">
               <img class="icon-GL" :src="card.imagem" alt="Imagem do produto" />
               <div class="space">
@@ -124,14 +120,8 @@
               <p><span>Observação:</span>{{card.observacao}}</p>
             </div>
             <div>
-              <button class="btn-icon-card">
-                <img class="icon-card" src="../assets/edit-solid.svg" alt="Editar" />
-              </button>
               <button class="btn-icon-card" @click="moverParaListaPrincipal(index)">
                 <img class="icon-card" src="../assets/exchange-alt-solid.svg" alt="Mover" />
-              </button>
-              <button class="btn-icon-card" @click="removerCard(index)">
-                <img class="icon-GL" src="../assets/trash-alt.svg" alt="Remover" />
               </button>
             </div>
           </div>
@@ -157,13 +147,13 @@ export default {
       const termo = this.termoPesquisa.toLowerCase().trim();
 
       if (termo === "") {
-        return this.cards;
+        return this.cards.filter((card) => !this.isCardInNonEssentialsList(card));
       }
 
       return this.cards.filter((card) => {
         const nomeProduto = card.produto.toLowerCase();
-        return nomeProduto.includes(termo);
-      });
+        return nomeProduto.includes(termo) && !this.isCardInNonEssentialsList(card);
+    });
     },
   },
   mounted() {
@@ -189,6 +179,9 @@ export default {
       this.salvarCards();
       this.limparFormulario();
     },
+    isCardInNonEssentialsList(card) {
+    return this.itensNaoNecessarios.includes(card);
+  },
     checkboxChanged(card, index) {
       const sourceArray = this.isCardInMainList(card) ? this.cards : this.itensNaoNecessarios;
       sourceArray[index] = card;
