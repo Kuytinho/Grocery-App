@@ -89,7 +89,7 @@
               <button class="btn-icon-card">
                 <img class="icon-card" src="../assets/edit-solid.svg" alt="Editar" />
               </button>
-              <button class="btn-icon-card">
+              <button class="btn-icon-card" @click="moverCard(index)">
                 <img class="icon-card" src="../assets/exchange-alt-solid.svg" alt="Mover" />
               </button>
               <button class="btn-icon-card" @click="removerCard(index)">
@@ -101,11 +101,46 @@
       </ul>
       <h4>Itens não necessários desta vez</h4>
       <ul>
-        <li></li>
+        <li v-for="(card, index) in itensNaoNecessarios" :key="index" :class="{ checked: card.checked, unchecked: !card.checked }">
+          <div class="line-top">
+            <label class="container">
+              <input type="checkbox" v-model="card.checked" @change="checkboxChanged(card, index)" />
+              <span class="checkmark"></span>
+            </label>
+            <div class="line-top-inside">
+              <img class="icon-GL" :src="card.imagem" alt="Imagem do produto" />
+              <div class="space">
+                <p><span>Produto:</span>{{ card.produto }}</p>
+                <p><span>Quantidade:</span>{{ card.quantidade }}</p>
+              </div>
+              <div>
+                <p><span>Marca:</span>{{ card.marca }}</p>
+                <p><span>Embalagem:</span>{{ card.embalagem }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="line-bottom">
+            <div class="space-II">
+              <p><span>Observação:</span>{{card.observacao}}</p>
+            </div>
+            <div>
+              <button class="btn-icon-card">
+                <img class="icon-card" src="../assets/edit-solid.svg" alt="Editar" />
+              </button>
+              <button class="btn-icon-card" @click="moverParaListaPrincipal(index)">
+                <img class="icon-card" src="../assets/exchange-alt-solid.svg" alt="Mover" />
+              </button>
+              <button class="btn-icon-card" @click="removerCard(index)">
+                <img class="icon-GL" src="../assets/trash-alt.svg" alt="Remover" />
+              </button>
+            </div>
+          </div>
+        </li>
       </ul>
     </section>
   </section>
 </template>
+
 
 
 <script>
@@ -114,6 +149,7 @@ export default {
     return {
       cards: [],
       termoPesquisa: "",
+      itensNaoNecessarios: [],
     };
   },
   computed: {
@@ -133,7 +169,9 @@ export default {
   mounted() {
     const savedCards = localStorage.getItem("savedCards");
     if (savedCards) {
-      this.cards = JSON.parse(savedCards);
+      const { cards, itensNaoNecessarios } = JSON.parse(savedCards);
+      this.cards = cards;
+      this.itensNaoNecessarios = itensNaoNecessarios;
     }
   },
   methods: {
@@ -152,7 +190,8 @@ export default {
       this.limparFormulario();
     },
     checkboxChanged(card, index) {
-      this.cards[index] = card;
+      const sourceArray = this.isCardInMainList(card) ? this.cards : this.itensNaoNecessarios;
+      sourceArray[index] = card;
       this.salvarCards();
     },
     removerCard(index) {
@@ -160,7 +199,11 @@ export default {
       this.salvarCards();
     },
     salvarCards() {
-      localStorage.setItem("savedCards", JSON.stringify(this.cards));
+      const savedCards = JSON.stringify({
+        cards: this.cards,
+        itensNaoNecessarios: this.itensNaoNecessarios,
+      });
+      localStorage.setItem("savedCards", savedCards);
     },
     limparFormulario() {
       this.produto = "";
@@ -170,43 +213,48 @@ export default {
       this.embalagem = "";
       this.observacao = "";
     },
+    moverCard(index) {
+      const card = {
+        ...this.cards[index],
+        checked: false,
+      };
+      this.cards.splice(index, 1);
+      this.itensNaoNecessarios.push(card);
+      this.salvarCards();
+    },
+    moverParaListaPrincipal(index) {
+      const card = {
+        ...this.itensNaoNecessarios[index],
+        checked: false,
+      };
+      this.itensNaoNecessarios.splice(index, 1);
+      this.cards.push(card);
+      this.salvarCards();
+    },
     goHome() {
       localStorage.setItem("selected", this.nome);
-      // Redirecionar de volta para a página principal```javascript
       this.$router.push({ path: "/" });
     },
     pesquisar() {
-  const termo = this.termoPesquisa.toLowerCase().trim();
-
-  if (termo === "") {
-    // Nenhum termo de pesquisa, exibir todos os cards
-    return;
-  }
-
-  this.cards.forEach((card) => {
-    const nomeProduto = card.produto.toLowerCase();
-
-    if (nomeProduto.includes(termo)) {
-      card.hidden = false; // Exibir o card
-    } else {
-      card.hidden = true; // Ocultar o card
-    }
-  });
-},
-    computed: {
-    filteredCards() {
       const termo = this.termoPesquisa.toLowerCase().trim();
 
       if (termo === "") {
-        return this.cards;
-      } else {
-        return this.cards.filter((card) => {
-          const nomeProduto = card.produto.toLowerCase();
-          return nomeProduto.includes(termo);
-        });
+        return;
       }
-    }
-  }
+
+      this.cards.forEach((card) => {
+        const nomeProduto = card.produto.toLowerCase();
+
+        if (nomeProduto.includes(termo)) {
+          card.hidden = false;
+        } else {
+          card.hidden = true;
+        }
+      });
+    },
+    isCardInMainList(card) {
+      return this.cards.includes(card);
+    },
   },
 };
 </script>
