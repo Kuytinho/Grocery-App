@@ -86,7 +86,7 @@
               <p><span>Observação:</span>{{card.observacao}}</p>
             </div>
             <div>
-              <button class="btn-icon-card">
+              <button class="btn-icon-card" @click="editarCard(index)">
                 <img class="icon-card" src="../assets/edit-solid.svg" alt="Editar" />
               </button>
               <button class="btn-icon-card" @click="moverCard(index)">
@@ -95,6 +95,66 @@
               <button class="btn-icon-card" @click="removerCard(index)">
                 <img class="icon-GL" src="../assets/trash-alt.svg" alt="Remover" />
               </button>
+            </div>
+          </div>
+          <div v-if="mostrarFormularioEdicao && cardIndexEdicao === index" class="line-bottom">
+            <div class="form-item">
+              <label for="produto-edicao">Produto</label>
+              <input
+                id="produto-edicao"
+                v-model="produtoEdicao"
+                type="text"
+                placeholder="Nome do produto"
+                class="edit-item"
+              />
+            </div>
+            <div class="form-item">
+              <label for="quantidade-edicao">Quantidade</label>
+              <input
+                id="quantidade-edicao"
+                type="text"
+                placeholder="Quantidade e a unidade de medida"
+                v-model="quantidadeEdicao"
+                class="edit-item"
+              />
+            </div>
+            <div class="form-item">
+              <label for="imagem-edicao">Imagem</label>
+              <input
+                id="imagem-edicao"
+                type="text"
+                placeholder="Url da imagem do produto"
+                v-model="imagemEdicao"
+                class="edit-item"
+              />
+            </div>
+            <div class="form-item">
+              <label for="marca-edicao">Marca</label>
+              <input
+                id="marca-edicao"
+                type="text"
+                placeholder="Marca do produto, se houver"
+                v-model="marcaEdicao"
+                class="edit-item"
+              />
+            </div>
+            <div class="form-item">
+              <label for="embalagem-edicao">Embalagem</label>
+              <input
+                id="embalagem-edicao"
+                type="text"
+                placeholder="Tamanho da embalagem, se houver"
+                v-model="embalagemEdicao"
+                class="edit-item"
+              />
+            </div>
+            <div class="form-item">
+              <label for="obs-edicao">Observação</label>
+              <input v-model="observacaoEdicao" class="edit-item" id="obs-edicao" type="text" />
+            </div>
+            <div class="form-buttons edit-button">
+              <button class="btn-principal" @click="salvarEdicao">Salvar</button>
+              <button class="btn-secundario" @click="cancelarEdicao">Cancelar</button>
             </div>
           </div>
         </li>
@@ -131,8 +191,6 @@
   </section>
 </template>
 
-
-
 <script>
 export default {
   data() {
@@ -140,6 +198,20 @@ export default {
       cards: [],
       termoPesquisa: "",
       itensNaoNecessarios: [],
+      produto: "",
+      quantidade: "",
+      imagem: "",
+      marca: "",
+      embalagem: "",
+      observacao: "",
+      produtoEdicao: "",
+      quantidadeEdicao: "",
+      imagemEdicao: "",
+      marcaEdicao: "",
+      embalagemEdicao: "",
+      observacaoEdicao: "",
+      cardIndexEdicao: null,
+      mostrarFormularioEdicao: false,
     };
   },
   computed: {
@@ -153,7 +225,7 @@ export default {
       return this.cards.filter((card) => {
         const nomeProduto = card.produto.toLowerCase();
         return nomeProduto.includes(termo) && !this.isCardInNonEssentialsList(card);
-    });
+      });
     },
   },
   mounted() {
@@ -179,9 +251,6 @@ export default {
       this.salvarCards();
       this.limparFormulario();
     },
-    isCardInNonEssentialsList(card) {
-    return this.itensNaoNecessarios.includes(card);
-  },
     checkboxChanged(card, index) {
       const sourceArray = this.isCardInMainList(card) ? this.cards : this.itensNaoNecessarios;
       sourceArray[index] = card;
@@ -248,9 +317,38 @@ export default {
     isCardInMainList(card) {
       return this.cards.includes(card);
     },
+    isCardInNonEssentialsList(card) {
+      return this.itensNaoNecessarios.includes(card);
+    },
+    editarCard(index) {
+      const card = this.cards[index];
+      this.produtoEdicao = card.produto;
+      this.quantidadeEdicao = card.quantidade;
+      this.imagemEdicao = card.imagem;
+      this.marcaEdicao = card.marca;
+      this.embalagemEdicao = card.embalagem;
+      this.observacaoEdicao = card.observacao;
+      this.cardIndexEdicao = index;
+      this.mostrarFormularioEdicao = true;
+    },
+    salvarEdicao() {
+      const cardIndex = this.cardIndexEdicao;
+      this.cards[cardIndex].produto = this.produtoEdicao;
+      this.cards[cardIndex].quantidade = this.quantidadeEdicao;
+      this.cards[cardIndex].imagem = this.imagemEdicao;
+      this.cards[cardIndex].marca = this.marcaEdicao;
+      this.cards[cardIndex].embalagem = this.embalagemEdicao;
+      this.cards[cardIndex].observacao = this.observacaoEdicao;
+      this.mostrarFormularioEdicao = false;
+      this.salvarCards();
+    },
+    cancelarEdicao() {
+      this.mostrarFormularioEdicao = false;
+    },
   },
 };
 </script>
+
 
 <style scooped>
 ul {
@@ -596,5 +694,9 @@ h4 {
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+.edit-item {
+  width: 90px;
 }
 </style>
