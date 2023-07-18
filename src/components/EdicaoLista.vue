@@ -7,54 +7,34 @@
   </section>
   <section class="main">
     <section class="column-left">
-      <h3 class="other-color">Adicionar Item</h3>
+      <h3 class="other-color">{{ modoEdicao ? 'Editar Item' : 'Adicionar Item' }}</h3>
       <div class="form">
         <div class="form-item">
           <label for="produto">Produto</label>
-          <input id="produto" v-model="produto" type="text" placeholder="Nome do produto" />
+          <input id="produto" :value="modoEdicao ? cardEditado.produto : produto" @input="updateProduto" type="text" placeholder="Nome do produto" />
         </div>
         <div class="form-item">
           <label for="quantidade">Quantidade</label>
-          <input
-            id="quantidade"
-            type="text"
-            placeholder="Quantidade e a unidade de medida"
-            v-model="quantidade"
-          />
+          <input id="quantidade" :value="modoEdicao ? cardEditado.quantidade : quantidade" @input="updateQuantidade" type="text" placeholder="Quantidade e a unidade de medida" />
         </div>
         <div class="form-item">
           <label for="imagem">Imagem</label>
-          <input
-            id="imagem"
-            type="text"
-            placeholder="Url da imagem do produto"
-            v-model="imagem"
-          />
+          <input id="imagem" :value="modoEdicao ? cardEditado.imagem : imagem" @input="updateImagem" type="text" placeholder="Url da imagem do produto" />
         </div>
         <div class="form-item">
           <label for="marca">Marca</label>
-          <input
-            id="marca"
-            type="text"
-            placeholder="Marca do produto, se houver"
-            v-model="marca"
-          />
+          <input id="marca" :value="modoEdicao ? cardEditado.marca : marca" @input="updateMarca" type="text" placeholder="Marca do produto, se houver" />
         </div>
         <div class="form-item">
           <label for="embalagem">Embalagem</label>
-          <input
-            id="embalagem"
-            type="text"
-            placeholder="Tamanho da embalagem, se houver"
-            v-model="embalagem"
-          />
+          <input id="embalagem" :value="modoEdicao ? cardEditado.embalagem : embalagem" @input="updateEmbalagem" type="text" placeholder="Tamanho da embalagem, se houver" />
         </div>
         <div class="form-item">
           <label for="obs">Observação</label>
-          <input v-model="observacao" id="obs" type="text" />
+          <input :value="modoEdicao ? cardEditado.observacao : observacao" @input="updateObservacao" id="obs" type="text" />
         </div>
       </div>
-      <button class="add" @click="adicionarCard">Adicionar</button>
+      <button class="add" @click="modoEdicao ? salvarEdicaoCard() : adicionarCard()">{{ modoEdicao ? 'Salvar' : 'Adicionar' }}</button>
     </section>
     <section class="column-right">
       <h3>Lista de Compras</h3>
@@ -85,7 +65,7 @@
             <div class="space-II">
               <p><span>Observação:</span>{{card.observacao}}</p>
             </div>
-            <div>
+            <div v-if="!mostrarFormularioEdicao">
               <button class="btn-icon-card" @click="editarCard(index)">
                 <img class="icon-card" src="../assets/edit-solid.svg" alt="Editar" />
               </button>
