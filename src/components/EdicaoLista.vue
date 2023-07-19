@@ -1,167 +1,232 @@
 <template>
   <section class="header-GL">
     <button class="btn-icon-GL">
-      <img class="icon-GL" src="../assets/back-icon.svg" @click="goHome" alt="Voltar" />
+      <img
+        class="icon-GL"
+        src="../assets/back-icon.svg"
+        @click="goHome"
+        alt="Voltar"
+      />
       <span class="back" @click="goHome">Voltar</span>
     </button>
   </section>
   <section class="main">
     <section class="column-left">
-      <h3 class="other-color">{{ modoEdicao ? 'Editar Item' : 'Adicionar Item' }}</h3>
+      <h3 class="other-color">Adicionar Item</h3>
       <div class="form">
         <div class="form-item">
           <label for="produto">Produto</label>
-          <input id="produto" :value="modoEdicao ? cardEditado.produto : produto" @input="updateProduto" type="text" placeholder="Nome do produto" />
+          <input
+            id="produto"
+            v-model="produto"
+            type="text"
+            placeholder="Nome do produto"
+          />
         </div>
         <div class="form-item">
           <label for="quantidade">Quantidade</label>
-          <input id="quantidade" :value="modoEdicao ? cardEditado.quantidade : quantidade" @input="updateQuantidade" type="text" placeholder="Quantidade e a unidade de medida" />
+          <input
+            id="quantidade"
+            type="text"
+            placeholder="Quantidade e a unidade de medida"
+            v-model="quantidade"
+          />
         </div>
         <div class="form-item">
           <label for="imagem">Imagem</label>
-          <input id="imagem" :value="modoEdicao ? cardEditado.imagem : imagem" @input="updateImagem" type="text" placeholder="Url da imagem do produto" />
+          <input
+            id="imagem"
+            type="text"
+            placeholder="Url da imagem do produto"
+            v-model="imagem"
+          />
         </div>
         <div class="form-item">
           <label for="marca">Marca</label>
-          <input id="marca" :value="modoEdicao ? cardEditado.marca : marca" @input="updateMarca" type="text" placeholder="Marca do produto, se houver" />
+          <input
+            id="marca"
+            type="text"
+            placeholder="Marca do produto, se houver"
+            v-model="marca"
+          />
         </div>
         <div class="form-item">
           <label for="embalagem">Embalagem</label>
-          <input id="embalagem" :value="modoEdicao ? cardEditado.embalagem : embalagem" @input="updateEmbalagem" type="text" placeholder="Tamanho da embalagem, se houver" />
+          <input
+            id="embalagem"
+            type="text"
+            placeholder="Tamanho da embalagem, se houver"
+            v-model="embalagem"
+          />
         </div>
         <div class="form-item">
           <label for="obs">Observação</label>
-          <input :value="modoEdicao ? cardEditado.observacao : observacao" @input="updateObservacao" id="obs" type="text" />
+          <input v-model="observacao" id="obs" type="text" />
         </div>
       </div>
-      <button class="add" @click="modoEdicao ? salvarEdicaoCard() : adicionarCard()">{{ modoEdicao ? 'Salvar' : 'Adicionar' }}</button>
+      <button class="add" @click="adicionarCard">Adicionar</button>
     </section>
     <section class="column-right">
       <h3>Lista de Compras</h3>
       <div>
-        <input class="search" type="search" v-model="termoPesquisa" placeholder="Buscar" />
-        <button class="btn-principal-II" @click="pesquisar">Pesquisar</button>
+        <input
+          class="search"
+          type="search"
+          v-model="termoPesquisa"
+          placeholder="Buscar"
+        />
       </div>
       <ul class="card-list">
-        <li v-for="(card, index) in filteredCards" :key="index" :class="{ checked: card.checked, unchecked: !card.checked }">
+        <li
+          v-for="(card, index) in filteredCards"
+          :key="index"
+          :class="{ checked: card.checked, unchecked: !card.checked }"
+        >
           <div class="line-top">
             <label class="container">
-              <input type="checkbox" v-model="card.checked" @change="checkboxChanged(card, index)" />
+              <input
+                type="checkbox"
+                v-model="card.checked"
+                @change="checkboxChanged(card, index)"
+              />
               <span class="checkmark"></span>
             </label>
             <div class="line-top-inside">
               <img class="icon-GL" :src="card.imagem" alt="Imagem do produto" />
               <div class="space">
-                <p><span>Produto:</span>{{ card.produto }}</p>
-                <p><span>Quantidade:</span>{{ card.quantidade }}</p>
+                <p>
+                  <b>Produto:</b><span class="inside">{{ card.produto }}</span>
+                </p>
+                <p>
+                  <b>Quantidade:</b
+                  ><span class="inside">{{ card.quantidade }}</span>
+                </p>
               </div>
               <div>
-                <p><span>Marca:</span>{{ card.marca }}</p>
-                <p><span>Embalagem:</span>{{ card.embalagem }}</p>
+                <p>
+                  <b>Marca:</b><span class="inside">{{ card.marca }}</span>
+                </p>
+                <p>
+                  <b>Embalagem:</b
+                  ><span class="inside">{{ card.embalagem }}</span>
+                </p>
               </div>
             </div>
           </div>
           <div class="line-bottom">
             <div class="space-II">
-              <p><span>Observação:</span>{{card.observacao}}</p>
+              <p>
+                <b>Observação:</b
+                ><span class="inside">{{ card.observacao }}</span>
+              </p>
             </div>
-            <div v-if="!mostrarFormularioEdicao">
-              <button class="btn-icon-card" @click="editarCard(index)">
+            <div>
+              <button class="btn-icon-card" @click="card.editando = true" v-if="!card.editando">
                 <img class="icon-card" src="../assets/edit-solid.svg" alt="Editar" />
               </button>
-              <button class="btn-icon-card" @click="moverCard(index)">
-                <img class="icon-card" src="../assets/exchange-alt-solid.svg" alt="Mover" />
+              <button class="btn-icon-card" v-if="!card.editando">
+                <img @click="moverCard(index)" class="icon-card" src="../assets/exchange-alt-solid.svg" alt="Mover" />
               </button>
-              <button class="btn-icon-card" @click="removerCard(index)">
-                <img class="icon-GL" src="../assets/trash-alt.svg" alt="Remover" />
+              <button class="btn-icon-card" v-if="!card.editando">
+                <img @click="removerCard(index)" class="icon-GL" src="../assets/trash-alt.svg" alt="Remover" />
               </button>
             </div>
           </div>
-          <div v-if="mostrarFormularioEdicao && cardIndexEdicao === index" class="line-bottom">
-            <div class="form-item">
-              <label for="produto-edicao">Produto</label>
-              <input
-                id="produto-edicao"
-                v-model="produtoEdicao"
-                type="text"
-                placeholder="Nome do produto"
-                class="edit-item"
-              />
+
+          <div class="edicao" v-if="card.editando">
+            <hr />
+            <h5>Editar Produto</h5>
+            <div class="edicao-inside">
+              <div class="column-edicao-I">
+                <input
+                  id="produto"
+                  v-model="card.produto"
+                  type="text"
+                  placeholder="Nome do produto"
+                />
+                <input
+                  id="marca"
+                  type="text"
+                  placeholder="Marca do produto, se houver"
+                  v-model="card.marca"
+                />
+                <input
+                  id="imagem"
+                  type="text"
+                  placeholder="Url da imagem do produto"
+                  v-model="card.imagem"
+                />
+              </div>
+              <div class="column-edicao-II">
+                <input
+                  id="quantidade"
+                  type="text"
+                  placeholder="Quantidade e a unidade de medida"
+                  v-model="card.quantidade"
+                />
+                <input
+                  id="embalagem"
+                  type="text"
+                  placeholder="Tamanho da embalagem, se houver"
+                  v-model="card.embalagem"
+                />
+                <input v-model="card.observacao" id="obs" type="text" />
+              </div>
             </div>
-            <div class="form-item">
-              <label for="quantidade-edicao">Quantidade</label>
-              <input
-                id="quantidade-edicao"
-                type="text"
-                placeholder="Quantidade e a unidade de medida"
-                v-model="quantidadeEdicao"
-                class="edit-item"
-              />
-            </div>
-            <div class="form-item">
-              <label for="imagem-edicao">Imagem</label>
-              <input
-                id="imagem-edicao"
-                type="text"
-                placeholder="Url da imagem do produto"
-                v-model="imagemEdicao"
-                class="edit-item"
-              />
-            </div>
-            <div class="form-item">
-              <label for="marca-edicao">Marca</label>
-              <input
-                id="marca-edicao"
-                type="text"
-                placeholder="Marca do produto, se houver"
-                v-model="marcaEdicao"
-                class="edit-item"
-              />
-            </div>
-            <div class="form-item">
-              <label for="embalagem-edicao">Embalagem</label>
-              <input
-                id="embalagem-edicao"
-                type="text"
-                placeholder="Tamanho da embalagem, se houver"
-                v-model="embalagemEdicao"
-                class="edit-item"
-              />
-            </div>
-            <div class="form-item">
-              <label for="obs-edicao">Observação</label>
-              <input v-model="observacaoEdicao" class="edit-item" id="obs-edicao" type="text" />
-            </div>
-            <div class="form-buttons edit-button">
-              <button class="btn-principal" @click="salvarEdicao">Salvar</button>
-              <button class="btn-secundario" @click="cancelarEdicao">Cancelar</button>
+            <div class="line-btn">
+              <button class="bnt-cancelar" @click="card.editando = false">Cancelar</button>
+              <button class="bnt-salvar" @click="salvarEdicao(card)">Salvar</button>
             </div>
           </div>
         </li>
       </ul>
       <h4>Itens não necessários desta vez</h4>
       <ul>
-        <li v-for="(card, index) in itensNaoNecessarios" :key="index" :class="{ checked: card.checked, unchecked: !card.checked }">
-          <div class="line-top">
+        <li
+          v-for="(card, index) in itensNaoNecessarios"
+          :key="index"
+          :class="{ checked: card.checked, unchecked: !card.checked }"
+        >
+          <div class="line-top-II-nao">
             <div class="line-top-inside">
               <img class="icon-GL" :src="card.imagem" alt="Imagem do produto" />
               <div class="space">
-                <p><span>Produto:</span>{{ card.produto }}</p>
-                <p><span>Quantidade:</span>{{ card.quantidade }}</p>
+                <p>
+                  <b>Produto:</b><span class="inside">{{ card.produto }}</span>
+                </p>
+                <p>
+                  <b>Quantidade:</b
+                  ><span class="inside">{{ card.quantidade }}</span>
+                </p>
               </div>
               <div>
-                <p><span>Marca:</span>{{ card.marca }}</p>
-                <p><span>Embalagem:</span>{{ card.embalagem }}</p>
+                <p>
+                  <b>Marca:</b><span class="inside">{{ card.marca }}</span>
+                </p>
+                <p>
+                  <b>Embalagem:</b
+                  ><span class="inside">{{ card.embalagem }}</span>
+                </p>
               </div>
             </div>
           </div>
-          <div class="line-bottom">
+          <div class="line-bottom-nao">
             <div class="space-II">
-              <p><span>Observação:</span>{{card.observacao}}</p>
+              <p>
+                <b>Observação:</b
+                ><span class="inside">{{ card.observacao }}</span>
+              </p>
             </div>
             <div>
-              <button class="btn-icon-card" @click="moverParaListaPrincipal(index)">
-                <img class="icon-card" src="../assets/exchange-alt-solid.svg" alt="Mover" />
+              <button
+                class="btn-icon-card-II"
+                @click="moverParaListaPrincipal(index)"
+              >
+                <img
+                  class="icon-card"
+                  src="../assets/exchange-alt-solid.svg"
+                  alt="Mover"
+                />
               </button>
             </div>
           </div>
@@ -176,40 +241,30 @@ export default {
   data() {
     return {
       cards: [],
-      termoPesquisa: "",
+      termoPesquisa: '',
       itensNaoNecessarios: [],
-      produto: "",
-      quantidade: "",
-      imagem: "",
-      marca: "",
-      embalagem: "",
-      observacao: "",
-      produtoEdicao: "",
-      quantidadeEdicao: "",
-      imagemEdicao: "",
-      marcaEdicao: "",
-      embalagemEdicao: "",
-      observacaoEdicao: "",
-      cardIndexEdicao: null,
-      mostrarFormularioEdicao: false,
     };
   },
   computed: {
     filteredCards() {
       const termo = this.termoPesquisa.toLowerCase().trim();
 
-      if (termo === "") {
-        return this.cards.filter((card) => !this.isCardInNonEssentialsList(card));
+      if (termo === '') {
+        return this.cards.filter(
+          (card) => !this.isCardInNonEssentialsList(card)
+        );
       }
 
       return this.cards.filter((card) => {
         const nomeProduto = card.produto.toLowerCase();
-        return nomeProduto.includes(termo) && !this.isCardInNonEssentialsList(card);
+        return (
+          nomeProduto.includes(termo) && !this.isCardInNonEssentialsList(card)
+        );
       });
     },
   },
   mounted() {
-    const savedCards = localStorage.getItem("savedCards");
+    const savedCards = localStorage.getItem('savedCards');
     if (savedCards) {
       const { cards, itensNaoNecessarios } = JSON.parse(savedCards);
       this.cards = cards;
@@ -226,13 +281,39 @@ export default {
         embalagem: this.embalagem,
         observacao: this.observacao,
         checked: false,
+        editando: false,
       };
       this.cards.push(card);
       this.salvarCards();
       this.limparFormulario();
     },
+    salvarEdicao(card) {
+      card.editando = false;
+      // Você pode adicionar outras lógicas de validação, etc., aqui antes de salvar as alterações
+
+      // Encontrar o índice do card atual na lista de cards
+      const index = this.cards.indexOf(card);
+
+      if (index !== -1) {
+        // Atualizar as informações do card com os valores dos campos de edição
+        this.cards[index].produto = card.produto;
+        this.cards[index].quantidade = card.quantidade;
+        this.cards[index].imagem = card.imagem;
+        this.cards[index].marca = card.marca;
+        this.cards[index].embalagem = card.embalagem;
+        this.cards[index].observacao = card.observacao;
+
+        // Salvar as informações do card no local adequado (por exemplo, em um servidor, localStorage, etc.)
+        this.salvarCards();
+      }
+    },
+    isCardInNonEssentialsList(card) {
+      return this.itensNaoNecessarios.includes(card);
+    },
     checkboxChanged(card, index) {
-      const sourceArray = this.isCardInMainList(card) ? this.cards : this.itensNaoNecessarios;
+      const sourceArray = this.isCardInMainList(card)
+        ? this.cards
+        : this.itensNaoNecessarios;
       sourceArray[index] = card;
       this.salvarCards();
     },
@@ -245,15 +326,15 @@ export default {
         cards: this.cards,
         itensNaoNecessarios: this.itensNaoNecessarios,
       });
-      localStorage.setItem("savedCards", savedCards);
+      localStorage.setItem('savedCards', savedCards);
     },
     limparFormulario() {
-      this.produto = "";
-      this.quantidade = "";
-      this.imagem = "";
-      this.marca = "";
-      this.embalagem = "";
-      this.observacao = "";
+      this.produto = '';
+      this.quantidade = '';
+      this.imagem = '';
+      this.marca = '';
+      this.embalagem = '';
+      this.observacao = '';
     },
     moverCard(index) {
       const card = {
@@ -274,13 +355,13 @@ export default {
       this.salvarCards();
     },
     goHome() {
-      localStorage.setItem("selected", this.nome);
-      this.$router.push({ path: "/" });
+      localStorage.setItem('selected', this.nome);
+      this.$router.push({ path: '/' });
     },
     pesquisar() {
       const termo = this.termoPesquisa.toLowerCase().trim();
 
-      if (termo === "") {
+      if (termo === '') {
         return;
       }
 
@@ -297,38 +378,9 @@ export default {
     isCardInMainList(card) {
       return this.cards.includes(card);
     },
-    isCardInNonEssentialsList(card) {
-      return this.itensNaoNecessarios.includes(card);
-    },
-    editarCard(index) {
-      const card = this.cards[index];
-      this.produtoEdicao = card.produto;
-      this.quantidadeEdicao = card.quantidade;
-      this.imagemEdicao = card.imagem;
-      this.marcaEdicao = card.marca;
-      this.embalagemEdicao = card.embalagem;
-      this.observacaoEdicao = card.observacao;
-      this.cardIndexEdicao = index;
-      this.mostrarFormularioEdicao = true;
-    },
-    salvarEdicao() {
-      const cardIndex = this.cardIndexEdicao;
-      this.cards[cardIndex].produto = this.produtoEdicao;
-      this.cards[cardIndex].quantidade = this.quantidadeEdicao;
-      this.cards[cardIndex].imagem = this.imagemEdicao;
-      this.cards[cardIndex].marca = this.marcaEdicao;
-      this.cards[cardIndex].embalagem = this.embalagemEdicao;
-      this.cards[cardIndex].observacao = this.observacaoEdicao;
-      this.mostrarFormularioEdicao = false;
-      this.salvarCards();
-    },
-    cancelarEdicao() {
-      this.mostrarFormularioEdicao = false;
-    },
   },
 };
 </script>
-
 
 <style scooped>
 ul {
@@ -336,8 +388,7 @@ ul {
   padding: 0;
   margin-top: 32px;
   margin-bottom: 16px;
-  /*  width: 768px;*/
-  align-self: stretch;
+  width: 800px;
 }
 
 li {
@@ -355,6 +406,7 @@ li {
   border-radius: 8px;
   background: #734720;
   width: 392px;
+  height: 760px;
 }
 .column-right {
   display: flex;
@@ -364,6 +416,12 @@ li {
   width: 816px;
   margin-left: 32px;
 }
+
+.inside span {
+  display: flex;
+  font-weight: 400;
+}
+
 .header-GL {
   margin-bottom: 48px;
 }
@@ -389,6 +447,14 @@ li {
   margin-left: 16px;
 }
 
+.btn-icon-card-II {
+  display: inline-flex;
+  border: none;
+  background: none;
+  width: 24px;
+  margin-left: 144px;
+}
+
 .back {
   color: #4f5902;
   font-size: 16px;
@@ -405,7 +471,7 @@ label {
   line-height: 150%;
 }
 .search {
-  width: 622px;
+  width: 800px;
 }
 .btn-principal-II {
   flex-direction: row;
@@ -463,9 +529,6 @@ h4 {
 
 .form-item {
   margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
 }
 
 .form input {
@@ -503,6 +566,124 @@ h4 {
   background-color: #f2ece6;
 }
 
+.edicao-inside {
+  display: flex;
+  flex-direction: row;
+  align-self: stretch;
+  width: 748px;
+}
+
+.column-edicao-I {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 24px;
+}
+
+.column-edicao-II {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.column-edicao-I input {
+  box-sizing: border-box;
+  flex-direction: row;
+  height: 32px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: #4f5902;
+  border-radius: 4px;
+  border: 2px solid #d9a679;
+  padding: 4px 8px;
+  align-items: flex-start;
+  color: #402712;
+  margin-top: 16px;
+  width: 362px;
+}
+
+.column-edicao-I input:focus {
+  border: 2px solid #402712;
+}
+
+.column-edicao-II input {
+  box-sizing: border-box;
+  flex-direction: row;
+  height: 32px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: #4f5902;
+  border-radius: 4px;
+  border: 2px solid #d9a679;
+  padding: 4px 8px;
+  align-items: flex-start;
+  color: #402712;
+  margin-top: 16px;
+  width: 362px;
+}
+
+.column-edicao-II input:focus {
+  border: 2px solid #402712;
+}
+
+h5 {
+  color: #734720;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 120%;
+  margin: 0px;
+  padding: 0px;
+}
+
+hr {
+  border-top: 2px solid #d9a679;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.line-btn {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  margin-top: 16px;
+  align-self: stretch;
+}
+
+.bnt-salvar {
+  width: 121px;
+  padding: 6px 32px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  background: #402712;
+  color: #f2ece6;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 150%;
+  height: 32px;
+  border: none;
+  margin-left: 16px;
+}
+
+.bnt-cancelar {
+  width: 121px;
+  padding: 6px 32px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 2px solid #734720;
+  color: #734720;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 150%;
+  height: 32px;
+  background: none;
+}
+
 .checked {
   display: flex;
   padding: 24px;
@@ -511,6 +692,7 @@ h4 {
   align-self: stretch;
   border-radius: 8px;
   background: #bbbf34;
+  border: 2px solid #bbbf34;
 }
 
 .unchecked {
@@ -530,6 +712,15 @@ h4 {
   align-items: center;
   align-self: stretch;
 }
+
+.line-top-II {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  align-self: stretch;
+  margin-left: 48px;
+}
+
 .line-top-inside {
   display: flex;
   justify-content: center;
@@ -553,7 +744,7 @@ h4 {
   line-height: 150%;
 }
 
-.line-top-inside span {
+.line-top-inside b {
   font-weight: 700;
   margin-right: 4px;
 }
@@ -563,6 +754,13 @@ h4 {
   justify-content: left;
   align-items: center;
   margin-left: 48px;
+  margin-top: 8px;
+}
+
+.line-bottom-nao {
+  display: flex;
+  justify-content: left;
+  align-items: center;
   margin-top: 8px;
 }
 
@@ -591,12 +789,26 @@ h4 {
   line-height: 150%;
 }
 
+.line-bottom-nao p {
+  margin: 0;
+  padding: 0;
+  color: #402712;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+}
+
 .line-bottom-disabled span {
   font-weight: 700;
   margin-right: 4px;
 }
 
-.line-bottom span {
+.line-bottom b {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.line-bottom-nao b {
   font-weight: 700;
   margin-right: 4px;
 }
@@ -607,7 +819,7 @@ h4 {
 }
 
 .space-II {
-  width: 544px;
+  width: 574px;
 }
 
 .space-III {
@@ -674,9 +886,5 @@ h4 {
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
-}
-
-.edit-item {
-  width: 90px;
 }
 </style>
